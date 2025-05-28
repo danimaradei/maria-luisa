@@ -50,6 +50,8 @@ body {
   width: 60%;
   height: 40%;
   font-size: 100%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .boton1 button{
@@ -64,9 +66,13 @@ body {
   background-color: #ed9521;
 }
 
+button:hover {
+  transform: scale(1.05);
+}
+
 .footer {
   grid-area: footer;
-  background-color: #000000;
+  background-color: #3f1f00;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,16 +87,19 @@ body {
 .footer-icons .icono {
   width: 17%;
   height: 17%;
-  margin: 0 2%;
+  margin: 0 5%;
   object-fit: cover;
+  border-radius: 15%;
 }
 
-/* ✅ MEDIA QUERY: para pantallas pequeñas (ej. celular) */
+
+
+/*MEDIA QUERY: para pantallas pequeñas*/
 @media (max-width: 768px) {
   body {
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: 20% auto auto auto 15%;
     grid-template-areas:
       "header"
       "boton1"
@@ -107,14 +116,14 @@ body {
   .boton1 button,
   .boton2 button,
   .boton3 button {
-    width: 80%;
-    height: 50%;
+    width: 50%;
+    height: 60%;
     font-size: 100%;
   }
 
   .footer-icons .icono {
-    width: 12%;
-    height: 12%;
+    width: 15%;
+    height: 15%;
     margin: 0 3%;
   }
 
