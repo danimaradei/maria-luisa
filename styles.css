@@ -1,0 +1,129 @@
+body {
+  display: grid;
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-rows: 27.5% 17.5% 30% 25%; /* header, banner, botones, footer */
+  grid-template-areas:
+    "header header header"
+    "banner banner banner"
+    "boton1 boton2 boton3"
+    "footer footer footer";
+  height: 100vh;
+  margin: 0;
+}
+
+.header {
+  grid-area: header;
+  overflow: hidden;
+}
+
+.header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner {
+  grid-area: banner;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+}
+
+.banner-texto {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.botones {
+  display: contents;
+}
+
+.boton1, .boton2, .boton3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boton1 {
+  grid-area: boton1;
+}
+
+.boton2 {
+  grid-area: boton2;
+}
+
+.boton3 {
+  grid-area: boton3;
+}
+
+.boton1 button,
+.boton2 button,
+.boton3 button {
+  width: 60%;
+  height: 40%;
+  font-size: 100%;
+}
+
+.footer {
+  grid-area: footer;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-icons .icono {
+  width: 8%;
+  height: 8%;
+  margin: 0 2%;
+  object-fit: cover;
+}
+
+/* ✅ MEDIA QUERY: para pantallas pequeñas (ej. celular) */
+@media (max-width: 768px) {
+  body {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto auto auto;
+    grid-template-areas:
+      "header"
+      "banner"
+      "boton1"
+      "boton2"
+      "boton3"
+      "footer";
+  }
+
+  .boton1, .boton2, .boton3 {
+    width: 100%;
+    padding: 5% 0;
+  }
+
+  .boton1 button,
+  .boton2 button,
+  .boton3 button {
+    width: 80%;
+    height: 50%;
+    font-size: 100%;
+  }
+
+  .footer-icons .icono {
+    width: 12%;
+    height: 12%;
+    margin: 0 3%;
+  }
+
+  .banner-texto {
+    font-size: 100%;
+    text-align: center;
+    padding: 2
+  }
+
+}
