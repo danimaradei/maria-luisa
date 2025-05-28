@@ -52,6 +52,10 @@ body {
   font-size: 100%;
   cursor: pointer;
   transition: transform 0.2s ease;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
 }
 
 .boton1 button{
@@ -80,17 +84,25 @@ button:hover {
 
 .footer-icons {
   display: flex;
-  align-items: center;
+  gap: 5%;
   justify-content: center;
+  align-items: center;
+}
+
+.footer-icons a {
+  display: inline-block;
+  width: 17%;
+  margin: 0 5%;
 }
 
 .footer-icons .icono {
-  width: 17%;
-  height: 17%;
-  margin: 0 5%;
+  width: 100%;
+  height: auto;
+  display: block;
   object-fit: cover;
   border-radius: 15%;
 }
+
 
 
 
@@ -99,7 +111,7 @@ button:hover {
   body {
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 20% auto auto auto 15%;
+    grid-template-rows: 20% auto auto auto 12%;
     grid-template-areas:
       "header"
       "boton1"
@@ -121,10 +133,21 @@ button:hover {
     font-size: 100%;
   }
 
-  .footer-icons .icono {
+.footer-icons {
+    gap: 4%;
+  }
+
+  .footer-icons a {
     width: 15%;
-    height: 15%;
-    margin: 0 3%;
+  }
+
+  .footer-icons .icono {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    display: block;
+    object-fit: cover;
+    border-radius: 15%;
   }
 
 }
