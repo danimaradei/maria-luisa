@@ -1,7 +1,7 @@
 body {
   display: grid;
   grid-template-columns: 33.33% 33.33% 33.33%;
-  grid-template-rows: 40% 50% 10%; /* header, botones, footer */
+  grid-template-rows: 35% 50% 15%; /* header, botones, footer */
   grid-template-areas:
     "header header header"
     "boton1 boton2 boton3"
@@ -79,8 +79,8 @@ body {
 }
 
 .footer-icons .icono {
-  width: 12%;
-  height: 12%;
+  width: 17%;
+  height: 17%;
   margin: 0 2%;
   object-fit: cover;
 }
