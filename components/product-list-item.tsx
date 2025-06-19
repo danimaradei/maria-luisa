@@ -5,17 +5,19 @@ import type { Product } from "@/types/inventory"
 
 interface ProductListItemProps {
   product: Product
+  isNew: boolean
   rightContent?: React.ReactNode
   showStock?: boolean
   className?: string
 }
 
-export function ProductListItem({ product, rightContent, showStock = true, className = "" }: ProductListItemProps) {
+export function ProductListItem({ product, isNew, rightContent, showStock = true, className = "" }: ProductListItemProps) {
   const isOutOfStock = product.quantity === 0
   const isLowStock = product.quantity <= product.minQuantity && product.quantity > 0
 
   const getStockText = () => {
-    if (isOutOfStock) return "Sin stock"
+    if (isOutOfStock && !isNew) return "Sin stock"
+    if (isNew) return "Producto nuevo"
     if (product.quantity === 1) return "Queda 1 unidad"
     return `Quedan ${product.quantity} unidades`
   }
@@ -28,10 +30,10 @@ export function ProductListItem({ product, rightContent, showStock = true, class
 
   return (
     <div
-      className={`flex items-center justify-between py-3 px-4 border-b border-gray-100 last:border-b-0 ${isOutOfStock ? "opacity-50 bg-gray-50" : "bg-white"} ${className}`}
+      className="flex items-center justify-between py-3 px-4 border-b border-gray-100 last:border-b-0"
     >
       <div className="flex-1 min-w-0">
-        <h3 className={`font-medium text-base truncate ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}>
+        <h3 className="font-medium text-base truncate">
           {product.name}
         </h3>
         {showStock && <p className={`text-sm ${getStockColor()}`}>{getStockText()}</p>}

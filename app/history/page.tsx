@@ -73,7 +73,7 @@ export default function HistoryPage() {
         onLogout={logout}
         showBackButton
         onBackClick={() => router.push("/")}
-        title="Historial de Usos"
+        title="Historial de Consumos"
       />
 
       <div className="p-4">

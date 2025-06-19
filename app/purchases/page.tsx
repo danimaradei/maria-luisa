@@ -88,12 +88,22 @@ export default function PurchasesPage() {
   }
 
   const handleAddProduct = () => {
-    if (newProduct.name.trim()) {
-      addProduct(newProduct)
-      setNewProduct({ name: "", initialQuantity: 0, minQuantity: 1 })
-      setShowAddProduct(false)
+  if (newProduct.name.trim()) {
+    const addedProduct = addProduct(newProduct)
+
+    // Esperar que `addProduct` devuelva el producto con `id`
+    if (addedProduct && addedProduct.id) {
+      setPurchaseCounters((prev) => ({
+        ...prev,
+        [addedProduct.id]: newProduct.initialQuantity,
+      }))
     }
+
+    setNewProduct({ name: "", initialQuantity: 0, minQuantity: 1 })
+    setShowAddProduct(false)
   }
+}
+
 
   const hasItems = Object.values(purchaseCounters).some((count) => count > 0)
 
@@ -132,7 +142,7 @@ export default function PurchasesPage() {
         onLogout={logout}
         showBackButton
         onBackClick={() => router.push("/")}
-        title="Productos Comprados Hoy"
+        title="Productos Comprados"
       />
 
       <div className="p-4">
@@ -141,7 +151,7 @@ export default function PurchasesPage() {
             + Crear Producto Nuevo
           </Button>
 
-          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Buscar productos para comprar..." />
+          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Buscar productos para registrar..." />
 
           {searchQuery && (
             <div className="text-sm text-gray-500">
@@ -161,6 +171,7 @@ export default function PurchasesPage() {
                     <ProductListItem
                       key={product.id}
                       product={product}
+                      isNew={product.quantity === 0 && counter > 0}
                       rightContent={
                         <div className="flex items-center gap-2">
                           <Button

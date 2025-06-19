@@ -18,12 +18,6 @@ interface InventoryFiltersProps {
 export function InventoryFilters({ activeFilter, onFilterChange, counts }: InventoryFiltersProps) {
   const filters = [
     {
-      key: "all" as const,
-      label: "Todos",
-      count: counts.all,
-      variant: "outline" as const,
-    },
-    {
       key: "out-of-stock" as const,
       label: "Sin Stock",
       count: counts.outOfStock,
@@ -33,12 +27,6 @@ export function InventoryFilters({ activeFilter, onFilterChange, counts }: Inven
       key: "low-stock" as const,
       label: "Stock Bajo",
       count: counts.lowStock,
-      variant: "secondary" as const,
-    },
-    {
-      key: "normal-stock" as const,
-      label: "Stock Normal",
-      count: counts.normalStock,
       variant: "default" as const,
     },
   ]

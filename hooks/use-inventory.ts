@@ -90,24 +90,28 @@ export function useInventory() {
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-  const addProduct = (newProduct: NewProduct) => {
-    const product: Product = {
-      id: Date.now().toString(),
-      name: newProduct.name.trim(),
-      quantity: newProduct.initialQuantity,
-      minQuantity: newProduct.minQuantity,
-    }
-    setProducts((prev) => [...prev, product])
-
-    // Agregar a compras de hoy
-    const purchase: DailyPurchase = {
-      productId: product.id,
-      productName: product.name,
-      quantity: newProduct.initialQuantity,
-      date: today,
-    }
-    setDailyPurchases((prev) => [...prev, purchase])
+  const addProduct = (newProduct: NewProduct): Product => {
+  const product: Product = {
+    id: Date.now().toString(),
+    name: newProduct.name.trim(),
+    quantity: 0, // 👈 Inventario real empieza en 0
+    minQuantity: newProduct.minQuantity,
   }
+
+  setProducts((prev) => [...prev, product])
+
+  const purchase: DailyPurchase = {
+    productId: product.id,
+    productName: product.name,
+    quantity: newProduct.initialQuantity,
+    date: today,
+  }
+  setDailyPurchases((prev) => [...prev, purchase])
+
+  return product
+}
+
+
 
   const confirmUsage = (usageItems: Array<{ productId: string; productName: string; quantity: number }>) => {
     // Actualizar inventario

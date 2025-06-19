@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Package, User, LogOut, ArrowLeft } from "lucide-react"
+import Image from "next/image";
 
 interface HeaderProps {
   isAdmin: boolean
@@ -31,7 +32,9 @@ export function Header({
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
-            <Package className="h-8 w-8 text-blue-600" />
+           
+            <Image src="/logo-hogar.png" alt="Logo" width={80} height={80} />
+
             <h1 className="text-xl font-bold text-gray-900">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
