@@ -37,7 +37,7 @@ export default function NotificationsPage() {
         onLogout={logout}
         showBackButton
         onBackClick={() => router.push("/")}
-        title="Alertas de Stock"
+        title="Notificaciones"
       />
 
       <div className="p-4">

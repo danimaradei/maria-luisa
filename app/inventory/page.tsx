@@ -62,7 +62,7 @@ export default function InventoryPage() {
         onLogout={logout}
         showBackButton
         onBackClick={() => router.push("/")}
-        title="Inventario Completo"
+        title="Inventario"
       />
 
       <div className="p-4">

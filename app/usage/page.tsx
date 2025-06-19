@@ -92,12 +92,12 @@ export default function UsagePage() {
         onLogout={logout}
         showBackButton
         onBackClick={() => router.push("/")}
-        title="Productos Usados Hoy"
+        title="Productos Usados"
       />
 
       <div className="p-4">
         <div className="max-w-md mx-auto space-y-4">
-          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Buscar productos para usar..." />
+          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Buscar productos para registrar..." />
 
           {searchQuery && (
             <div className="text-sm text-gray-500">

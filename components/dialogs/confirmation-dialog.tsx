@@ -26,7 +26,7 @@ export function ConfirmationDialog({ open, onOpenChange, pendingAction, onConfir
         </DialogHeader>
         <div className="space-y-4">
           <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-            <h3 className="font-semibold text-gray-900">Resumen:</h3>
+            <h3 className="font-semibold text-gray-900">Recién {pendingAction.type === "use" ? "utilicé" : "compré" }</h3>
             {pendingAction.items.map((item, index) => (
               <div key={index} className="flex justify-between text-sm">
                 <span>{item.productName}</span>
