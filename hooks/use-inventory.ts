@@ -1,6 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  query,
+  where,
+  serverTimestamp,
+} from "firebase/firestore"
+import { db } from "@/lib/firebase"
 import type { Product, DailyUsage, DailyPurchase, DailyUsageGroup } from "@/types/inventory"
 
 type NewProduct = {
@@ -11,172 +25,137 @@ type NewProduct = {
 
 export function useInventory() {
   const [products, setProducts] = useState<Product[]>([])
-  const [allDailyUsage, setAllDailyUsage] = useState<DailyUsage[]>([])
+  const [usageHistory, setUsageHistory] = useState<DailyUsageGroup[]>([])
   const [dailyPurchases, setDailyPurchases] = useState<DailyPurchase[]>([])
 
   const today = new Date().toISOString().split("T")[0]
 
-  // Cargar datos del localStorage
+  // Cargar productos desde Firestore en tiempo real
   useEffect(() => {
-    const savedProducts = localStorage.getItem("inventory-products")
-    const savedUsage = localStorage.getItem("daily-usage")
-    const savedPurchases = localStorage.getItem("daily-purchases")
+    const unsubscribe = onSnapshot(collection(db, "inventory"), (snapshot) => {
+      const items: Product[] = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Product))
+      setProducts(items)
+    })
+    return () => unsubscribe()
+  }, [])
 
-    if (savedProducts) {
-      try {
-        setProducts(JSON.parse(savedProducts))
-      } catch (error) {
-        console.error("Error cargando productos:", error)
-      }
-    }
+  // Cargar historial de uso agrupado por fecha
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "usage"), (snapshot) => {
+      const allUsage: DailyUsage[] = snapshot.docs.map((doc) => doc.data() as DailyUsage)
 
-    if (savedUsage) {
-      try {
-        const usage = JSON.parse(savedUsage)
-        setAllDailyUsage(usage)
-      } catch (error) {
-        console.error("Error cargando uso diario:", error)
-      }
-    }
+      const grouped = allUsage.reduce((groups: DailyUsageGroup[], item) => {
+        const existing = groups.find((g) => g.date === item.date)
+        if (existing) {
+          existing.items.push(item)
+          existing.totalQuantity += item.quantity
+        } else {
+          groups.push({
+            date: item.date,
+            items: [item],
+            totalProducts: 1,
+            totalQuantity: item.quantity,
+          })
+        }
+        return groups
+      }, []).map(group => ({
+        ...group,
+        totalProducts: group.items.length,
+      })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    if (savedPurchases) {
-      try {
-        const purchases = JSON.parse(savedPurchases)
-        setDailyPurchases(purchases.filter((item: DailyPurchase) => item.date === today))
-      } catch (error) {
-        console.error("Error cargando compras diarias:", error)
+      setUsageHistory(grouped)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  // Cargar compras del día actual
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(db, "purchases"), where("date", "==", today)),
+      (snapshot) => {
+        const items: DailyPurchase[] = snapshot.docs.map((doc) => doc.data() as DailyPurchase)
+        setDailyPurchases(items)
       }
-    }
+    )
+    return () => unsubscribe()
   }, [today])
 
-  // Guardar datos en localStorage
-  useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem("inventory-products", JSON.stringify(products))
+  const addProduct = async (newProduct: NewProduct): Promise<Product> => {
+    const productRef = doc(collection(db, "inventory"))
+    const newDoc: Product = {
+      id: productRef.id,
+      name: newProduct.name.trim(),
+      quantity: 0,
+      minQuantity: newProduct.minQuantity,
     }
-  }, [products])
 
-  useEffect(() => {
-    localStorage.setItem("daily-usage", JSON.stringify(allDailyUsage))
-  }, [allDailyUsage])
+    await setDoc(productRef, newDoc)
 
-  useEffect(() => {
-    localStorage.setItem("daily-purchases", JSON.stringify(dailyPurchases))
-  }, [dailyPurchases])
-
-  // Obtener uso diario solo de hoy
-  const dailyUsage = allDailyUsage.filter((item) => item.date === today)
-
-  // Agrupar uso por fecha
-  const usageHistory: DailyUsageGroup[] = allDailyUsage
-    .reduce((groups: DailyUsageGroup[], item) => {
-      const existingGroup = groups.find((g) => g.date === item.date)
-      if (existingGroup) {
-        existingGroup.items.push(item)
-        existingGroup.totalQuantity += item.quantity
-      } else {
-        groups.push({
-          date: item.date,
-          items: [item],
-          totalProducts: 1,
-          totalQuantity: item.quantity,
-        })
-      }
-      return groups
-    }, [])
-    .map((group) => ({
-      ...group,
-      totalProducts: group.items.length,
-    }))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-  const addProduct = (newProduct: NewProduct): Product => {
-  const product: Product = {
-    id: Date.now().toString(),
-    name: newProduct.name.trim(),
-    quantity: 0, // 👈 Inventario real empieza en 0
-    minQuantity: newProduct.minQuantity,
-  }
-
-  setProducts((prev) => [...prev, product])
-
-  const purchase: DailyPurchase = {
-    productId: product.id,
-    productName: product.name,
-    quantity: newProduct.initialQuantity,
-    date: today,
-  }
-  setDailyPurchases((prev) => [...prev, purchase])
-
-  return product
-}
-
-
-
-  const confirmUsage = (usageItems: Array<{ productId: string; productName: string; quantity: number }>) => {
-    // Actualizar inventario
-    setProducts((prev) =>
-      prev.map((product) => {
-        const usage = usageItems.find((item) => item.productId === product.id)
-        if (usage) {
-          return { ...product, quantity: Math.max(0, product.quantity - usage.quantity) }
-        }
-        return product
-      }),
-    )
-
-    // Actualizar uso diario completo
-    setAllDailyUsage((prev) => {
-      const updated = [...prev]
-      usageItems.forEach((item) => {
-        const existingIndex = updated.findIndex((u) => u.productId === item.productId && u.date === today)
-        if (existingIndex >= 0) {
-          updated[existingIndex].quantity += item.quantity
-        } else {
-          updated.push({
-            productId: item.productId,
-            productName: item.productName,
-            quantity: item.quantity,
-            date: today,
-          })
-        }
-      })
-      return updated
+    // Registrar compra inicial
+    await addDoc(collection(db, "purchases"), {
+      productId: productRef.id,
+      productName: newDoc.name,
+      quantity: newProduct.initialQuantity,
+      date: today,
+      timestamp: serverTimestamp(),
     })
-  }
 
-  const confirmPurchases = (purchaseItems: Array<{ productId: string; productName: string; quantity: number }>) => {
     // Actualizar inventario
-    setProducts((prev) =>
-      prev.map((product) => {
-        const purchase = purchaseItems.find((item) => item.productId === product.id)
-        if (purchase) {
-          return { ...product, quantity: product.quantity + purchase.quantity }
-        }
-        return product
-      }),
-    )
-
-    // Actualizar compras diarias
-    setDailyPurchases((prev) => {
-      const updated = [...prev]
-      purchaseItems.forEach((item) => {
-        const existingIndex = updated.findIndex((p) => p.productId === item.productId)
-        if (existingIndex >= 0) {
-          updated[existingIndex].quantity += item.quantity
-        } else {
-          updated.push({
-            productId: item.productId,
-            productName: item.productName,
-            quantity: item.quantity,
-            date: today,
-          })
-        }
-      })
-      return updated
+    await updateDoc(productRef, {
+      quantity: newProduct.initialQuantity,
     })
+
+    return newDoc
   }
 
+  const confirmUsage = async (usageItems: Array<{ productId: string; productName: string; quantity: number }>) => {
+    for (const item of usageItems) {
+      const productRef = doc(db, "inventory", item.productId)
+
+      // Obtener producto actual
+      const snapshot = await getDoc(productRef)
+      if (!snapshot.exists()) continue
+
+      const current = snapshot.data() as Product
+      const newQuantity = Math.max(0, current.quantity - item.quantity)
+
+      // Actualizar inventario
+      await updateDoc(productRef, { quantity: newQuantity })
+
+      // Agregar a colección de uso
+      await addDoc(collection(db, "usage"), {
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        date: today,
+        timestamp: serverTimestamp(),
+      })
+    }
+  }
+
+  const confirmPurchases = async (purchaseItems: Array<{ productId: string; productName: string; quantity: number }>) => {
+    for (const item of purchaseItems) {
+      const productRef = doc(db, "inventory", item.productId)
+
+      const snapshot = await getDoc(productRef)
+      if (!snapshot.exists()) continue
+
+      const current = snapshot.data() as Product
+      const newQuantity = current.quantity + item.quantity
+
+      await updateDoc(productRef, { quantity: newQuantity })
+
+      await addDoc(collection(db, "purchases"), {
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        date: today,
+        timestamp: serverTimestamp(),
+      })
+    }
+  }
+
+  const dailyUsage = usageHistory.find((g) => g.date === today)?.items || []
   const lowStockItems = products.filter((p) => p.quantity <= p.minQuantity && p.quantity > 0)
   const outOfStockItems = products.filter((p) => p.quantity === 0)
 
@@ -184,9 +163,9 @@ export function useInventory() {
     products,
     dailyUsage,
     dailyPurchases,
+    usageHistory,
     lowStockItems,
     outOfStockItems,
-    usageHistory,
     addProduct,
     confirmUsage,
     confirmPurchases,
