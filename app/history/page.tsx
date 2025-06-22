@@ -22,9 +22,10 @@ export default function HistoryPage() {
   const [selectedUsageGroup, setSelectedUsageGroup] = useState<DailyUsageGroup | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const handleLogin = async (password: string) => {
-    return await login(password)
+  const handleLogin = async (email: string, password: string) => {
+    return await login(email, password)
   }
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

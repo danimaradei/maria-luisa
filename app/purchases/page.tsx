@@ -33,9 +33,10 @@ export default function PurchasesPage() {
     minQuantity: 1,
   })
 
-  const handleLogin = async (password: string) => {
-    return await login(password)
+  const handleLogin = async (email: string, password: string) => {
+    return await login(email, password)
   }
+
 
   // Filtrar productos por búsqueda
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()))

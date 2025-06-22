@@ -1,37 +1,35 @@
+// hooks/use-auth.ts
 "use client"
 
 import { useState, useEffect } from "react"
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 
 export function useAuth() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Cargar estado de sesión al inicializar
   useEffect(() => {
-    const savedAdminState = localStorage.getItem("admin-session")
-    if (savedAdminState === "true") {
-      setIsAdmin(true)
-    }
-    setIsLoading(false)
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAdmin(!!user)
+      setIsLoading(false)
+    })
+    return () => unsubscribe()
   }, [])
 
-  // Guardar estado de sesión cuando cambie
-  useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem("admin-session", isAdmin.toString())
+  const login = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      return true
+    } catch (error: any) {
+      console.error("Login error:", error.message)
+      return false
     }
-  }, [isAdmin, isLoading])
-
-  const login = async (password: string) => {
-    // TODO: Integrar con Firestore para validar credenciales
-    // Por ahora, cualquier contraseña funciona
-    setIsAdmin(true)
-    return true
   }
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth)
     setIsAdmin(false)
-    localStorage.removeItem("admin-session")
   }
 
   return {

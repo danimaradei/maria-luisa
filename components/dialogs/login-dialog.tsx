@@ -11,17 +11,18 @@ import { Label } from "@/components/ui/label"
 interface LoginDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onLogin: (password: string) => Promise<boolean>
+  onLogin: (email: string, password: string) => Promise<boolean>
 }
 
 export function LoginDialog({ open, onOpenChange, onLogin }: LoginDialogProps) {
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
   const handleLogin = async () => {
-    if (!password.trim()) {
-      setError("Por favor ingresa una contraseña")
+    if (!email.trim() || !password.trim()) {
+      setError("Por favor ingresa el email y la contraseña")
       return
     }
 
@@ -29,12 +30,13 @@ export function LoginDialog({ open, onOpenChange, onLogin }: LoginDialogProps) {
     setError("")
 
     try {
-      const success = await onLogin(password)
+      const success = await onLogin(email, password)
       if (success) {
+        setEmail("")
         setPassword("")
         onOpenChange(false)
       } else {
-        setError("Contraseña incorrecta")
+        setError("Email o contraseña incorrectos")
       }
     } catch (err) {
       setError("Error al iniciar sesión")
@@ -49,6 +51,7 @@ export function LoginDialog({ open, onOpenChange, onLogin }: LoginDialogProps) {
     }
   }
 
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
@@ -57,9 +60,19 @@ export function LoginDialog({ open, onOpenChange, onLogin }: LoginDialogProps) {
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="password" className="text-base">
-              Contraseña
-            </Label>
+            <Label htmlFor="email" className="text-base">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Ingresar email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="text-lg py-6 mt-2"
+              disabled={isLoading}
+            />
+          </div>
+          <div>
+            <Label htmlFor="password" className="text-base">Contraseña</Label>
             <Input
               id="password"
               type="password"

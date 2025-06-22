@@ -17,9 +17,10 @@ export default function HomePage() {
   const { isAdmin, isLoading, login, logout } = useAuth()
   const [showLogin, setShowLogin] = useState(false)
 
-  const handleLogin = async (password: string) => {
-    return await login(password)
+  const handleLogin = async (email: string, password: string) => {
+    return await login(email, password)
   }
+
 
   const totalUsedToday = dailyUsage.reduce((sum, item) => sum + item.quantity, 0)
   const totalBoughtToday = dailyPurchases.reduce((sum, item) => sum + item.quantity, 0)

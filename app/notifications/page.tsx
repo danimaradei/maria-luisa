@@ -18,9 +18,10 @@ export default function NotificationsPage() {
   const [showLogin, setShowLogin] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const handleLogin = async (password: string) => {
-    return await login(password)
+  const handleLogin = async (email: string, password: string) => {
+    return await login(email, password)
   }
+
 
   const allAlerts = [...outOfStockItems, ...lowStockItems.filter((item) => item.quantity > 0)]
 

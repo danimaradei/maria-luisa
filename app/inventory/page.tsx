@@ -21,9 +21,10 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState<InventoryFilter>("all")
 
-  const handleLogin = async (password: string) => {
-    return await login(password)
+  const handleLogin = async (email: string, password: string) => {
+    return await login(email, password)
   }
+
 
   // Filtrar productos por búsqueda
   const searchFilteredProducts = products.filter((product) =>
