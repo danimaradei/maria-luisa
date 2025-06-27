@@ -71,6 +71,15 @@ export default function HomePage() {
       badge: totalHistoryDays > 0 ? totalHistoryDays : undefined,
       
     },
+    {
+      title: "Historial de Compras",
+      icon: History,
+      href: "/historicPurchases",
+      color: totalAlerts > 0 ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200",
+      iconColor: totalAlerts > 0 ? "text-red-600" : "text-gray-400",
+      badge: undefined,
+      
+    },
   ]
 
   if (isLoading) {
