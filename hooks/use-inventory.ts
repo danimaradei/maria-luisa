@@ -15,7 +15,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import type { Product, DailyUsage, DailyPurchase, DailyUsageGroup } from "@/types/inventory"
+import type { Product, DailyUsage, Purchase, DailyUsageGroup, PurchasesGroup } from "@/types/inventory"
 
 type NewProduct = {
   name: string
@@ -26,7 +26,8 @@ type NewProduct = {
 export function useInventory() {
   const [products, setProducts] = useState<Product[]>([])
   const [usageHistory, setUsageHistory] = useState<DailyUsageGroup[]>([])
-  const [dailyPurchases, setDailyPurchases] = useState<DailyPurchase[]>([])
+  const [dailyPurchases, setDailyPurchases] = useState<Purchase[]>([])
+  const [historicPurchases, setHistoricPurchases] = useState<PurchasesGroup[]>([])
 
   const today = new Date().toISOString().split("T")[0]
 
@@ -73,12 +74,39 @@ export function useInventory() {
     const unsubscribe = onSnapshot(
       query(collection(db, "purchases"), where("date", "==", today)),
       (snapshot) => {
-        const items: DailyPurchase[] = snapshot.docs.map((doc) => doc.data() as DailyPurchase)
+        const items: Purchase[] = snapshot.docs.map((doc) => doc.data() as Purchase)
         setDailyPurchases(items)
       }
     )
     return () => unsubscribe()
   }, [today])
+
+  // Cargo historial de compras x dia (grouped), mantengo los items separados igual, no mergeo c/u con su respectivo
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(db, "purchases")),
+      (snapshot) => {
+        const allHistoricPurchases: Purchase[] = snapshot.docs.map((doc) => doc.data() as Purchase)
+        
+        const groupedHistoricPurchases = allHistoricPurchases.reduce((groupedPurchases: PurchasesGroup[], purchase) => {
+          const historicPurchases = groupedPurchases.find((g) => g.date == purchase.date)
+            if(historicPurchases){
+              historicPurchases.items.push(purchase)
+            } else {
+              groupedPurchases.push({
+                date: purchase.date,
+                items: [purchase],
+              })
+            }
+            return groupedPurchases;
+          }, []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+          console.log(groupedHistoricPurchases)
+        setHistoricPurchases(groupedHistoricPurchases)
+      })
+
+    return () => unsubscribe()
+  }, [])
 
   const addProduct = async (newProduct: NewProduct): Promise<Product> => {
     const productRef = doc(collection(db, "inventory"))
@@ -166,6 +194,7 @@ export function useInventory() {
     usageHistory,
     lowStockItems,
     outOfStockItems,
+    historicPurchases,
     addProduct,
     confirmUsage,
     confirmPurchases,

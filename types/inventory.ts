@@ -12,7 +12,7 @@ export interface DailyUsage {
   date: string
 }
 
-export interface DailyPurchase {
+export interface Purchase {
   productId: string
   productName: string
   quantity: number
@@ -42,4 +42,9 @@ export interface DailyUsageGroup {
   items: DailyUsage[]
   totalProducts: number
   totalQuantity: number
+}
+
+export interface PurchasesGroup {
+    date: string
+    items: Purchase[]
 }
