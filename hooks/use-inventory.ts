@@ -81,7 +81,7 @@ export function useInventory() {
     return () => unsubscribe()
   }, [today])
 
-  // Cargo historial de compras x dia (grouped), mantengo los items separados igual, no mergeo c/u con su respectivo
+  // Cargo historial de compras x dia (grouped)
   useEffect(() => {
     const unsubscribe = onSnapshot(
       query(collection(db, "purchases")),
@@ -91,7 +91,12 @@ export function useInventory() {
         const groupedHistoricPurchases = allHistoricPurchases.reduce((groupedPurchases: PurchasesGroup[], purchase) => {
           const historicPurchases = groupedPurchases.find((g) => g.date == purchase.date)
             if(historicPurchases){
-              historicPurchases.items.push(purchase)
+              var idx = historicPurchases.items.findIndex(item => item.productName === purchase.productName)
+              if(idx === -1){
+                historicPurchases.items.push(purchase)
+              } else {
+                historicPurchases.items[idx].quantity += purchase.quantity
+              }
             } else {
               groupedPurchases.push({
                 date: purchase.date,
@@ -101,7 +106,6 @@ export function useInventory() {
             return groupedPurchases;
           }, []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-          console.log(groupedHistoricPurchases)
         setHistoricPurchases(groupedHistoricPurchases)
       })
 
