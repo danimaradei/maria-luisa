@@ -3,12 +3,18 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Package } from "lucide-react"
-import type { DailyUsageGroup } from "@/types/inventory"
+import type { DailyUsageGroup, PurchasesGroup } from "@/types/inventory"
 
 interface UsageHistoryDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  usageGroup: DailyUsageGroup | null
+  usageGroup: DailyUsageGroup | PurchasesGroup | null
+}
+
+function isDailyUsageGroup(obj: any): obj is DailyUsageGroup {
+  return obj &&
+    typeof obj.date === 'string' &&
+    typeof obj.usage === 'number';
 }
 
 export function UsageHistoryDialog({ open, onOpenChange, usageGroup }: UsageHistoryDialogProps) {
@@ -46,6 +52,8 @@ export function UsageHistoryDialog({ open, onOpenChange, usageGroup }: UsageHist
         </DialogHeader>
 
         <div className="space-y-4">
+          
+          {isDailyUsageGroup(usageGroup) &&
           <div className="bg-blue-50 p-3 rounded-lg">
             <div className="flex items-center justify-between text-sm">
               <span className="text-blue-800">Total de productos diferentes:</span>
@@ -59,7 +67,7 @@ export function UsageHistoryDialog({ open, onOpenChange, usageGroup }: UsageHist
                 {usageGroup.totalQuantity}
               </Badge>
             </div>
-          </div>
+          </div>}
 
           <div className="space-y-2">
             <h4 className="font-medium text-gray-900 flex items-center gap-2">
