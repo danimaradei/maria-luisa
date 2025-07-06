@@ -145,7 +145,7 @@ isAdmin,
               <h3 className="text-lg font-medium text-gray-700 mb-2">
                 {searchQuery
                   ? "No se encontraron registros"
-                  : "Sin historial de usos"}
+                  : "Sin historial"}
               </h3>
               <p className="text-gray-500 text-sm">
                 {searchQuery

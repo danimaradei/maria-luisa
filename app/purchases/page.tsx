@@ -39,8 +39,12 @@ export default function PurchasesPage() {
 
 
   // Filtrar productos por búsqueda
-  const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-
+  const filteredProducts = products
+    .filter((product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.quantity - b.quantity)
+    
   const updateCounter = (productId: string, change: number) => {
     setPurchaseCounters((prev) => {
       const current = prev[productId] || 0
