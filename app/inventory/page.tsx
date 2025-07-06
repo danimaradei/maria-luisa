@@ -70,7 +70,9 @@ export default function InventoryPage() {
         <div className="max-w-md mx-auto space-y-4">
           <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Buscar productos en inventario..." />
 
-          <InventoryFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} counts={counts} />
+          <InventoryFilters activeFilter={activeFilter} 
+          onFilterChange={(filter) => setActiveFilter((prev) => (prev === filter ? "all" : filter))} 
+          counts={counts}/>
 
           {searchQuery && (
             <div className="text-sm text-gray-500">
